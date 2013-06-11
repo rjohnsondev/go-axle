@@ -57,6 +57,48 @@ type Api struct {
 	createOnSave bool
 }
 
+func Apis(axleAddress string, from int, to int) (out []*Api, err error) {
+	reqAddress := fmt.Sprintf("%s%sapis?resolve=true", axleAddress, VERSION_ENDPOINT)
+	body, err := doHttpRequest("GET", reqAddress, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	response := make(map[string]interface{})
+	err = json.Unmarshal(body, &response)
+	if err != nil {
+		return nil, fmt.Errorf(
+			"Unable to unmarshal response: %s",
+			err.Error(),
+		)
+	}
+	response, validCast := response["results"].(map[string]interface{})
+	if !validCast {
+		return nil, fmt.Errorf(
+			"Unable to unmarshal response: %s",
+			err.Error(),
+		)
+	}
+	out = make([]*Api, len(response))
+	x := 0
+	for identifier, value := range response {
+		api := NewApi(axleAddress, identifier, "")
+		jsonvalue, err := json.Marshal(value)
+		if err != nil {
+			return nil, fmt.Errorf("Unable to decode api in response: %s", err.Error())
+		}
+		err = json.Unmarshal(jsonvalue, api)
+		if err != nil {
+			return nil, fmt.Errorf("Unable to decode api in response: %s", err.Error())
+		}
+		api.createOnSave = false
+		out[x] = api
+		x++
+	}
+
+	return out, nil
+}
+
 // NewApi creates a new API object with defaults.
 func NewApi(axleAddress string, identifier string, endPoint string) (out *Api) {
 	out = &Api{
@@ -261,6 +303,46 @@ func ApiKeys(axleAddress string, identifier string) (keys []string, err error) {
 	}
 
 	return keys, nil
+}
+
+// ApiCharts lists the top 100 keys and their hit rate for time period granularity.
+func ApiCharts(axleAddress string, granularity Granularity) (out map[string]int, err error) {
+	reqAddress := fmt.Sprintf(
+		"%s%sapis/charts?granularity=%s",
+		axleAddress,
+		VERSION_ENDPOINT,
+		granularity,
+	)
+
+	body, err := doHttpRequest("GET", reqAddress, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	responseMap := make(map[string]interface{})
+	err = json.Unmarshal(body, &responseMap)
+	if err != nil {
+		return nil, fmt.Errorf(
+			"Unable to unmarshal response from %s: %s",
+			reqAddress,
+			err.Error(),
+		)
+	}
+
+	resultsInterface, exists := responseMap["results"]
+	if !exists {
+		return nil, fmt.Errorf("Missing Key details from %s", reqAddress)
+	}
+	results, isValidCast := resultsInterface.(map[string]interface{})
+	if !isValidCast {
+		return nil, fmt.Errorf("Unable to cast to map from %s", reqAddress)
+	}
+	out = make(map[string]int, len(results))
+	for key, count := range results {
+		out[key] = int(count.(float64))
+	}
+
+	return out, nil
 }
 
 // KeyCharts lists the top 100 keys and their hit rate for time period granularity.

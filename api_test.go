@@ -1,7 +1,7 @@
 package goaxle
 
 import (
-	"fmt"
+	//"fmt"
 	"testing"
 	"time"
 )
@@ -140,7 +140,6 @@ func testKeyCharts(t *testing.T, api *Api) {
 }
 
 func testApiStats(t *testing.T, api *Api) {
-
 	anHourAgo, _ := time.ParseDuration("-1hr")
 	stats, err := api.Stats(
 		time.Now().Add(anHourAgo),
@@ -149,8 +148,33 @@ func testApiStats(t *testing.T, api *Api) {
 	)
 	if err != nil {
 		t.Errorf("Error gettings stats: %v", err)
+		t.Fatal()
 	}
-	fmt.Println(stats)
+	if stats == nil {
+		t.Errorf("Empty stats returned")
+		t.Fatal()
+	}
+}
+
+func testApis(t *testing.T) {
+	apis, err := Apis(TEST_API_AXLE_SERVER, 0, 10)
+	if err != nil {
+		t.Errorf("Error getting apis: %v", err)
+		t.Fatal()
+	}
+	if len(apis) != 1 {
+		t.Errorf("Wrong number of apis returned %d", len(apis))
+		t.Fatal()
+	}
+}
+
+func testApiCharts(t *testing.T) {
+
+	_, err := ApiCharts(TEST_API_AXLE_SERVER, GRANULARITY_MINUTES)
+	if err != nil {
+		t.Errorf("Error getting api keys charts: %v", err)
+		t.Fatal()
+	}
 }
 
 /* ex: set noexpandtab: */
