@@ -22,6 +22,7 @@ func TestAll(t *testing.T) {
 	DeleteKey(TEST_API_AXLE_SERVER, TEST_KEY_NAME)
 	DeleteKeyRing(TEST_API_AXLE_SERVER, TEST_KEYRING_NAME)
 
+	testInfo(t)
 	testGetNonExistentApi(t)
 	testCreateApi(t)
 	api := testGetApi(t)
@@ -32,9 +33,11 @@ func TestAll(t *testing.T) {
 	testUpdateKey(t, k)
 	testLinkKey(t, api)
 	testKeyCharts(t, api)
-	testListKeys(t)
+	testApiKeys(t)
 	testApis(t)
 	testApiCharts(t)
+	testKeyApiCharts(t)
+	testKeyApis(t, k)
 	testUnlinkKey(t)
 	testDeleteKey(t)
 	kr := testNewKeyRing(t)
@@ -42,7 +45,16 @@ func TestAll(t *testing.T) {
 	testUpdateKeyRing(t, kr)
 	testDeleteKeyRing(t)
 	testDeleteApi(t, api)
+}
 
+func testInfo(t *testing.T) {
+	info, err := Info(TEST_API_AXLE_SERVER)
+	if err != nil {
+		t.Errorf("Failed to get info: %s", err)
+	}
+	if len(info) != 2 {
+		t.Errorf("Was expecting two values in results")
+	}
 }
 
 /* ex: set noexpandtab: */

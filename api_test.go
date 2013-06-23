@@ -117,13 +117,13 @@ func testUnlinkKey(t *testing.T) {
 	}
 }
 
-func testListKeys(t *testing.T) {
+func testApiKeys(t *testing.T) {
 	keys, err := ApiKeys(TEST_API_AXLE_SERVER, TEST_API_NAME)
 	if err != nil {
 		t.Errorf("Error listing keys: %v", err)
 		t.Fatal()
 	}
-	if keys[0] != TEST_KEY_NAME {
+	if keys[0].Identifier != TEST_KEY_NAME {
 		t.Errorf("Key was not returned")
 		t.Fatal()
 	}

@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"time"
+	"encoding/json"
 )
 
 // API protocol type.
@@ -39,6 +40,28 @@ const (
 
 	VERSION_ENDPOINT = "v1/"
 )
+
+func Info(axleAddress string) (info map[string]interface{}, err error) {
+	reqAddress := fmt.Sprintf("%s%sinfo", axleAddress, VERSION_ENDPOINT)
+	body, err := doHttpRequest("GET", reqAddress, nil)
+	if err != nil {
+		return nil, fmt.Errorf("Unable to get Axle info: %s", err)
+	}
+	out := make(map[string]interface{})
+	err = json.Unmarshal(body, &out)
+	if err != nil {
+		return nil, fmt.Errorf("Unable to get unmarshal info: %s", err)
+	}
+	if resp, exists := out["results"]; exists {
+		// cast it on
+		info, isValidCast := resp.(map[string]interface{})
+		if (!isValidCast) {
+			return nil, fmt.Errorf("Unable to get axle info, results was not a map")
+		}
+		return info, nil
+	}
+	return nil, fmt.Errorf("Unable to get axle info, missing results in response")
+}
 
 // doHttpRequest performs verb on reqAddress, optionally posting postData.
 // It returns the full page contents as a slice, and / or an error object

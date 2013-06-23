@@ -64,4 +64,16 @@ func testDeleteKey(t *testing.T) {
 	}
 }
 
+func testKeyApiCharts(t *testing.T) {
+	_, err := KeyApiCharts(TEST_API_AXLE_SERVER, TEST_KEY_NAME, GRANULARITY_MINUTES)
+	if err != nil {
+		t.Errorf("Error getting chart: %v", err)
+		t.Fatal()
+	}
+}
+
+func testKeyApis(t *testing.T, k *Key) {
+
+}
+
 /* ex: set noexpandtab: */

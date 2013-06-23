@@ -257,18 +257,18 @@ func UnlinkKey(axleAddress string, apiIdentifier string, keyIdentifier string) (
 	return key, nil
 }
 
-// ListKeys returns a listing of all the keys linked with this API
-func (this *Api) Keys() (keys []string, err error) {
+// Keys returns a listing of all the keys linked with this API
+func (this *Api) Keys() (keys []*Key, err error) {
 	return ApiKeys(this.axleAddress, this.Identifier)
 }
 
 // ApiKeys returns a listing of all the keys linked with this API
-func ApiKeys(axleAddress string, identifier string) (keys []string, err error) {
+func ApiKeys(axleAddress string, apiIdentifier string) (keys []*Key, err error) {
 	reqAddress := fmt.Sprintf(
-		"%s%sapi/%s/keys",
+		"%s%sapi/%s/keys?resolve=true",
 		axleAddress,
 		VERSION_ENDPOINT,
-		identifier,
+		apiIdentifier,
 	)
 
 	body, err := doHttpRequest("GET", reqAddress, nil)
@@ -290,16 +290,25 @@ func ApiKeys(axleAddress string, identifier string) (keys []string, err error) {
 	if !exists {
 		return nil, fmt.Errorf("Missing Key details from %s", reqAddress)
 	}
-	results, isValidCast := resultsInterface.([]interface{})
+	results, isValidCast := resultsInterface.(map[string]interface{})
 	if !isValidCast {
 		return nil, fmt.Errorf("Unable to cast to list of keys from %s", reqAddress)
 	}
-	keys = make([]string, len(results))
-	for x, keyInterface := range results {
-		keys[x], isValidCast = keyInterface.(string)
-		if !isValidCast {
-			return nil, fmt.Errorf("Unable to cast key from %v", keyInterface)
+	keys = make([]*Key, len(results))
+	x := 0
+	for identifier, keyInterface := range results {
+		key := NewKey(axleAddress, identifier)
+		jsonvalue, err := json.Marshal(keyInterface)
+		if err != nil {
+			return nil, fmt.Errorf("Unable to decode key in response: %s", err)
 		}
+		err = json.Unmarshal(jsonvalue, key)
+		if err != nil {
+			return nil, fmt.Errorf("Unable to decode key in response: %s", err)
+		}
+		key.createOnSave = false
+		keys[x] = key
+		x++
 	}
 
 	return keys, nil

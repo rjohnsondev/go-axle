@@ -213,4 +213,53 @@ func DeleteKey(axleAddress string, identifier string) (err error) {
 	return nil
 }
 
+// ApiCharts lists the top 100 apis for this key and their hit rate for time period granularity.
+func (this *Key) ApiCharts(granularity Granularity) (out map[string]int, err error) {
+	return KeyApiCharts(this.axleAddress, this.Identifier, granularity)
+}
+// KeyApiCharts lists the top 100 apis for the specified key and their hit rate for time period granularity.
+func KeyApiCharts(axleAddress string, keyIdentifier string, granularity Granularity) (out map[string]int, err error) {
+	reqAddress := fmt.Sprintf(
+		"%s%skey/%s/apicharts?granularity=%s",
+		axleAddress,
+		VERSION_ENDPOINT,
+		keyIdentifier,
+		granularity,
+	)
+
+	body, err := doHttpRequest("GET", reqAddress, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	responseMap := make(map[string]interface{})
+	err = json.Unmarshal(body, &responseMap)
+	if err != nil {
+		return nil, fmt.Errorf(
+			"Unable to unmarshal response from %s: %s",
+			reqAddress,
+			err.Error(),
+		)
+	}
+
+	resultsInterface, exists := responseMap["results"]
+	if !exists {
+		return nil, fmt.Errorf("Missing API details from %s", reqAddress)
+	}
+	results, isValidCast := resultsInterface.(map[string]interface{})
+	if !isValidCast {
+		return nil, fmt.Errorf("Unable to cast to map from %s", reqAddress)
+	}
+	out = make(map[string]int, len(results))
+	for api, count := range results {
+		out[api] = int(count.(float64))
+	}
+
+	return out, nil
+}
+
+func KeyApis(axleAddress string, keyIdentifier string) (apis []*Api, err error) {
+	return nil, nil
+}
+
 /* ex: set noexpandtab: */
