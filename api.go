@@ -245,8 +245,8 @@ func ApiKeys(axleAddress string, apiIdentifier string, from int, to int) (keys [
 	return doKeysRequest(reqAddress, axleAddress)
 }
 
-// ApiCharts lists the top 100 keys and their hit rate for time period granularity.
-func ApiCharts(axleAddress string, granularity Granularity) (out map[string]int, err error) {
+// ApisCharts lists the top 100 keys and their hit rate for time period granularity.
+func ApisCharts(axleAddress string, granularity Granularity) (out map[string]int, err error) {
 	reqAddress := fmt.Sprintf(
 		"%s%sapis/charts?granularity=%s",
 		axleAddress,
@@ -275,13 +275,15 @@ func ApiKeyCharts(axleAddress string, apiIdentifier string, granularity Granular
 	return doChartsRequest(reqAddress)
 }
 
+//  Get stats for an api
 func (this *Api) Stats(from time.Time, to time.Time, granularity Granularity) (stats map[HitType]map[time.Time]map[int]int, err error) {
 	return ApiStats(this.axleAddress, this.Identifier, from, to, "", granularity)
 }
+//  Get stats for an api
 func (this *Api) StatsForKey(from time.Time, to time.Time, forkey string, granularity Granularity) (stats map[HitType]map[time.Time]map[int]int, err error) {
 	return ApiStats(this.axleAddress, this.Identifier, from, to, forkey, granularity)
 }
-
+//  Get stats for an api
 func ApiStats(axleAddress string, apiIdentifier string, from time.Time, to time.Time, forkey string, granularity Granularity) (stats map[HitType]map[time.Time]map[int]int, err error) {
 
 	reqAddress := fmt.Sprintf(

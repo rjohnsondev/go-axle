@@ -168,9 +168,9 @@ func testApis(t *testing.T) {
 	}
 }
 
-func testApiCharts(t *testing.T) {
+func testApisCharts(t *testing.T) {
 
-	_, err := ApiCharts(TEST_API_AXLE_SERVER, GRANULARITY_MINUTES)
+	_, err := ApisCharts(TEST_API_AXLE_SERVER, GRANULARITY_MINUTES)
 	if err != nil {
 		t.Errorf("Error getting api keys charts: %v", err)
 		t.Fatal()

@@ -197,6 +197,11 @@ func DeleteKeyRing(axleAddress string, identifier string) (err error) {
 	return nil
 }
 
+// Associate a key with a KEYRING.
+func (this *KeyRing) LinkKey(keyIdentifier string) (key *Key, err error) {
+	return KeyRingLinkKey(this.axleAddress, this.Identifier, keyIdentifier)
+}
+// Associate a key with a KEYRING.
 func KeyRingLinkKey(axleAddress string, keyRingIdentifier string, keyIdentifier string) (key *Key, err error) {
 
 	reqAddress := fmt.Sprintf(
@@ -273,16 +278,20 @@ func KeyRingKeys(axleAddress string, identifier string, from int, to int) (keys 
 	return doKeysRequest(reqAddress, axleAddress)
 }
 
+// Get stats for an keyring
 func (this *KeyRing) Stats(from time.Time, to time.Time, granularity Granularity) (stats map[HitType]map[time.Time]map[int]int, err error) {
 	return KeyRingStats(this.axleAddress, this.Identifier, from, to, "", "", granularity)
 }
+// Get stats for an keyring
 func (this *KeyRing) StatsForKey(from time.Time, to time.Time, forkey string, granularity Granularity) (stats map[HitType]map[time.Time]map[int]int, err error) {
 	return KeyRingStats(this.axleAddress, this.Identifier, from, to, forkey, "", granularity)
 }
+// Get stats for an keyring
 func (this *KeyRing) StatsForApi(from time.Time, to time.Time, forapi string, granularity Granularity) (stats map[HitType]map[time.Time]map[int]int, err error) {
 	return KeyRingStats(this.axleAddress, this.Identifier, from, to, "", forapi, granularity)
 }
 
+// Get stats for an keyring
 func KeyRingStats(axleAddress string, keyRingIdentifier string, from time.Time, to time.Time, forapi string, forkey string, granularity Granularity) (stats map[HitType]map[time.Time]map[int]int, err error) {
 
 	reqAddress := fmt.Sprintf(
@@ -305,6 +314,7 @@ func KeyRingStats(axleAddress string, keyRingIdentifier string, from time.Time, 
 	return doStatsRequest(reqAddress)
 }
 
+// List all KEYRINGs.
 func KeyRings(axleAddress string, from int, to int) (out []*KeyRing, err error) {
 	reqAddress := fmt.Sprintf(
 		"%s%skeyrings?resolve=true&from=%d&to=%d",

@@ -232,7 +232,7 @@ func KeyApiCharts(axleAddress string, keyIdentifier string, granularity Granular
 }
 
 // Get the most used keys and their hit counts.
-func KeyCharts(axleAddress string, granularity Granularity) (out map[string]int, err error) {
+func KeysCharts(axleAddress string, granularity Granularity) (out map[string]int, err error) {
 	reqAddress := fmt.Sprintf(
 		"%s%skeys/charts?granularity=%s",
 		axleAddress,
@@ -242,7 +242,6 @@ func KeyCharts(axleAddress string, granularity Granularity) (out map[string]int,
 
 	return doChartsRequest(reqAddress)
 }
-
 
 // List apis belonging to a key.
 func (this *Key) Apis() (out []*Api, err error) {
@@ -258,13 +257,16 @@ func KeyApis(axleAddress string, keyIdentifier string) (out []*Api, err error) {
 	return doApisRequest(reqAddress, axleAddress)
 }
 
+// Get the real time hits for a key.
 func (this *Key) Stats(from time.Time, to time.Time, granularity Granularity) (stats map[HitType]map[time.Time]map[int]int, err error) {
 	return KeyStats(this.axleAddress, this.Identifier, from, to, "", granularity)
 }
+// Get the real time hits for a key.
 func (this *Key) StatsForApi(from time.Time, to time.Time, forapi string, granularity Granularity) (stats map[HitType]map[time.Time]map[int]int, err error) {
 	return KeyStats(this.axleAddress, this.Identifier, from, to, forapi, granularity)
 }
 
+// Get the real time hits for a key.
 func KeyStats(axleAddress string, keyIdentifier string, from time.Time, to time.Time, forapi string, granularity Granularity) (stats map[HitType]map[time.Time]map[int]int, err error) {
 
 	reqAddress := fmt.Sprintf(
@@ -284,6 +286,7 @@ func KeyStats(axleAddress string, keyIdentifier string, from time.Time, to time.
 	return doStatsRequest(reqAddress)
 }
 
+// List all of the available keys.
 func Keys(axleAddress string, from int, to int) (keys []*Key, err error) {
 
 	reqAddress := fmt.Sprintf(

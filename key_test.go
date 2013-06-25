@@ -113,8 +113,8 @@ func testKeys(t *testing.T) {
 	}
 }
 
-func testKeyCharts(t *testing.T) {
-	charts, err := KeyCharts(TEST_API_AXLE_SERVER, GRANULARITY_MINUTES)
+func testKeysCharts(t *testing.T) {
+	charts, err := KeysCharts(TEST_API_AXLE_SERVER, GRANULARITY_MINUTES)
 	if err != nil {
 		t.Errorf("Error getting key charts: %v", err)
 		t.Fatal()
