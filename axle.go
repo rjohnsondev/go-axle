@@ -11,6 +11,7 @@ import (
 	"net/http"
 	"time"
 	"encoding/json"
+	"strconv"
 )
 
 // API protocol type.
@@ -131,6 +132,99 @@ func parseFloatToTime(theTime float64) time.Time {
 	milliSeconds := int64(theTime) % 1000
 	nanoSeconds := milliSeconds * 1000 * 1000
 	return time.Unix(seconds, nanoSeconds)
+}
+
+
+func doStatsRequest(reqAddress string) (stats map[HitType]map[time.Time]map[int]int, err error) {
+	body, err := doHttpRequest("GET", reqAddress, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	responseMap := make(map[string]interface{})
+	err = json.Unmarshal(body, &responseMap)
+	if err != nil {
+		return nil, fmt.Errorf(
+			"Unable to unmarshal response from %s: %s",
+			reqAddress,
+			err.Error(),
+		)
+	}
+
+	resultsInterface, exists := responseMap["results"]
+	if !exists {
+		return nil, fmt.Errorf("Missing results from %s", reqAddress)
+	}
+	results, validCast := resultsInterface.(map[string]interface{})
+	if !validCast {
+		return nil, fmt.Errorf("Missing stat details from %s", reqAddress)
+	}
+
+	stats = make(map[HitType]map[time.Time]map[int]int)
+	for hitType, value := range results {
+		if _, exists := stats[HitType(hitType)]; !exists {
+			stats[HitType(hitType)] = make(map[time.Time]map[int]int)
+		}
+		statsInterface, goodCast := value.(map[string]interface{})
+		if !goodCast {
+			return nil, fmt.Errorf("Bad stats object at %s", reqAddress)
+		}
+		for timeStampStr, value := range statsInterface {
+			timeStamp, _ := strconv.Atoi(timeStampStr)
+			timeGroup := time.Unix(int64(timeStamp), 0)
+			if _, exists := stats[HitType(hitType)][timeGroup]; !exists {
+				stats[HitType(hitType)][timeGroup] = make(map[int]int)
+			}
+			statsInterface, goodCast := value.(map[string]interface{})
+			if !goodCast {
+				return nil, fmt.Errorf("Bad stats object at %s", reqAddress)
+			}
+			for responseCodeStr, countInterface := range statsInterface {
+				responseCode, _ := strconv.Atoi(responseCodeStr)
+				countFloat, goodCast := countInterface.(float64)
+				if !goodCast {
+					return nil, fmt.Errorf("Bad stats object at %s", reqAddress)
+				}
+				stats[HitType(hitType)][timeGroup][responseCode] = int(countFloat)
+			}
+		}
+	}
+
+	return stats, nil
+}
+
+
+func doChartsRequest(reqAddress string) (out map[string]int, err error) {
+
+	body, err := doHttpRequest("GET", reqAddress, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	responseMap := make(map[string]interface{})
+	err = json.Unmarshal(body, &responseMap)
+	if err != nil {
+		return nil, fmt.Errorf(
+			"Unable to unmarshal response from %s: %s",
+			reqAddress,
+			err.Error(),
+		)
+	}
+
+	resultsInterface, exists := responseMap["results"]
+	if !exists {
+		return nil, fmt.Errorf("Missing results from %s", reqAddress)
+	}
+	results, isValidCast := resultsInterface.(map[string]interface{})
+	if !isValidCast {
+		return nil, fmt.Errorf("Unable to cast to map from %s", reqAddress)
+	}
+	out = make(map[string]int, len(results))
+	for key, count := range results {
+		out[key] = int(count.(float64))
+	}
+
+	return out, nil
 }
 
 /* ex: set noexpandtab: */

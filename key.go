@@ -228,35 +228,7 @@ func KeyApiCharts(axleAddress string, keyIdentifier string, granularity Granular
 		granularity,
 	)
 
-	body, err := doHttpRequest("GET", reqAddress, nil)
-	if err != nil {
-		return nil, err
-	}
-
-	responseMap := make(map[string]interface{})
-	err = json.Unmarshal(body, &responseMap)
-	if err != nil {
-		return nil, fmt.Errorf(
-			"Unable to unmarshal response from %s: %s",
-			reqAddress,
-			err.Error(),
-		)
-	}
-
-	resultsInterface, exists := responseMap["results"]
-	if !exists {
-		return nil, fmt.Errorf("Missing API details from %s", reqAddress)
-	}
-	results, isValidCast := resultsInterface.(map[string]interface{})
-	if !isValidCast {
-		return nil, fmt.Errorf("Unable to cast to map from %s", reqAddress)
-	}
-	out = make(map[string]int, len(results))
-	for api, count := range results {
-		out[api] = int(count.(float64))
-	}
-
-	return out, nil
+	return doChartsRequest(reqAddress)
 }
 
 // List apis belonging to a key.
@@ -308,6 +280,32 @@ func KeyApis(axleAddress string, keyIdentifier string) (out []*Api, err error) {
 	}
 
 	return out, nil
+}
+
+func (this *Key) Stats(from time.Time, to time.Time, granularity Granularity) (stats map[HitType]map[time.Time]map[int]int, err error) {
+	return KeyStats(this.axleAddress, this.Identifier, from, to, "", granularity)
+}
+func (this *Key) StatsForApi(from time.Time, to time.Time, forapi string, granularity Granularity) (stats map[HitType]map[time.Time]map[int]int, err error) {
+	return KeyStats(this.axleAddress, this.Identifier, from, to, forapi, granularity)
+}
+
+func KeyStats(axleAddress string, keyIdentifier string, from time.Time, to time.Time, forapi string, granularity Granularity) (stats map[HitType]map[time.Time]map[int]int, err error) {
+
+	reqAddress := fmt.Sprintf(
+		"%s%skey/%s/stats?from=%d&to=%d&granularity=%s",
+		axleAddress,
+		VERSION_ENDPOINT,
+		url.QueryEscape(keyIdentifier),
+		from.Unix(),
+		to.Unix(),
+		granularity,
+	)
+
+	if forapi != "" {
+		reqAddress += "&forapi=" + forapi
+	}
+
+	return doStatsRequest(reqAddress)
 }
 
 /* ex: set noexpandtab: */
