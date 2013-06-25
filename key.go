@@ -242,44 +242,7 @@ func KeyApis(axleAddress string, keyIdentifier string) (out []*Api, err error) {
 		VERSION_ENDPOINT,
 		url.QueryEscape(keyIdentifier),
 	)
-	body, err := doHttpRequest("GET", reqAddress, nil)
-	if err != nil {
-		return nil, err
-	}
-
-	response := make(map[string]interface{})
-	err = json.Unmarshal(body, &response)
-	if err != nil {
-		return nil, fmt.Errorf(
-			"Unable to unmarshal response: %s",
-			err.Error(),
-		)
-	}
-	response, validCast := response["results"].(map[string]interface{})
-	if !validCast {
-		return nil, fmt.Errorf(
-			"Unable to unmarshal response: %s",
-			err.Error(),
-		)
-	}
-	out = make([]*Api, len(response))
-	x := 0
-	for identifier, value := range response {
-		api := NewApi(axleAddress, identifier, "")
-		jsonvalue, err := json.Marshal(value)
-		if err != nil {
-			return nil, fmt.Errorf("Unable to decode api in response: %s", err.Error())
-		}
-		err = json.Unmarshal(jsonvalue, api)
-		if err != nil {
-			return nil, fmt.Errorf("Unable to decode api in response: %s", err.Error())
-		}
-		api.createOnSave = false
-		out[x] = api
-		x++
-	}
-
-	return out, nil
+	return doApisRequest(reqAddress, axleAddress)
 }
 
 func (this *Key) Stats(from time.Time, to time.Time, granularity Granularity) (stats map[HitType]map[time.Time]map[int]int, err error) {
@@ -306,6 +269,19 @@ func KeyStats(axleAddress string, keyIdentifier string, from time.Time, to time.
 	}
 
 	return doStatsRequest(reqAddress)
+}
+
+func Keys(axleAddress string, from int, to int) (keys []*Key, err error) {
+
+	reqAddress := fmt.Sprintf(
+		"%s%skeys?resolve=true&from=%d&to=%d",
+		axleAddress,
+		VERSION_ENDPOINT,
+		from,
+		to,
+	)
+
+	return doKeysRequest(reqAddress, axleAddress)
 }
 
 /* ex: set noexpandtab: */

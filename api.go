@@ -58,45 +58,14 @@ type Api struct {
 }
 
 func Apis(axleAddress string, from int, to int) (out []*Api, err error) {
-	reqAddress := fmt.Sprintf("%s%sapis?resolve=true", axleAddress, VERSION_ENDPOINT)
-	body, err := doHttpRequest("GET", reqAddress, nil)
-	if err != nil {
-		return nil, err
-	}
-
-	response := make(map[string]interface{})
-	err = json.Unmarshal(body, &response)
-	if err != nil {
-		return nil, fmt.Errorf(
-			"Unable to unmarshal response: %s",
-			err.Error(),
-		)
-	}
-	response, validCast := response["results"].(map[string]interface{})
-	if !validCast {
-		return nil, fmt.Errorf(
-			"Unable to unmarshal response: %s",
-			err.Error(),
-		)
-	}
-	out = make([]*Api, len(response))
-	x := 0
-	for identifier, value := range response {
-		api := NewApi(axleAddress, identifier, "")
-		jsonvalue, err := json.Marshal(value)
-		if err != nil {
-			return nil, fmt.Errorf("Unable to decode api in response: %s", err.Error())
-		}
-		err = json.Unmarshal(jsonvalue, api)
-		if err != nil {
-			return nil, fmt.Errorf("Unable to decode api in response: %s", err.Error())
-		}
-		api.createOnSave = false
-		out[x] = api
-		x++
-	}
-
-	return out, nil
+	reqAddress := fmt.Sprintf(
+		"%s%sapis?resolve=true&from=%d&to=%d",
+		axleAddress,
+		VERSION_ENDPOINT,
+		from,
+		to,
+	)
+	return doApisRequest(reqAddress, axleAddress)
 }
 
 // NewApi creates a new API object with defaults.
@@ -258,60 +227,22 @@ func UnlinkKey(axleAddress string, apiIdentifier string, keyIdentifier string) (
 }
 
 // Keys returns a listing of all the keys linked with this API
-func (this *Api) Keys() (keys []*Key, err error) {
-	return ApiKeys(this.axleAddress, this.Identifier)
+func (this *Api) Keys(from int, to int) (keys []*Key, err error) {
+	return ApiKeys(this.axleAddress, this.Identifier, from, to)
 }
 
 // ApiKeys returns a listing of all the keys linked with this API
-func ApiKeys(axleAddress string, apiIdentifier string) (keys []*Key, err error) {
+func ApiKeys(axleAddress string, apiIdentifier string, from int, to int) (keys []*Key, err error) {
 	reqAddress := fmt.Sprintf(
-		"%s%sapi/%s/keys?resolve=true",
+		"%s%sapi/%s/keys?resolve=true&from=%d&to=%d",
 		axleAddress,
 		VERSION_ENDPOINT,
 		url.QueryEscape(apiIdentifier),
+		from,
+		to,
 	)
 
-	body, err := doHttpRequest("GET", reqAddress, nil)
-	if err != nil {
-		return nil, err
-	}
-
-	responseMap := make(map[string]interface{})
-	err = json.Unmarshal(body, &responseMap)
-	if err != nil {
-		return nil, fmt.Errorf(
-			"Unable to unmarshal response from %s: %s",
-			reqAddress,
-			err.Error(),
-		)
-	}
-
-	resultsInterface, exists := responseMap["results"]
-	if !exists {
-		return nil, fmt.Errorf("Missing Key details from %s", reqAddress)
-	}
-	results, isValidCast := resultsInterface.(map[string]interface{})
-	if !isValidCast {
-		return nil, fmt.Errorf("Unable to cast to list of keys from %s", reqAddress)
-	}
-	keys = make([]*Key, len(results))
-	x := 0
-	for identifier, keyInterface := range results {
-		key := NewKey(axleAddress, identifier)
-		jsonvalue, err := json.Marshal(keyInterface)
-		if err != nil {
-			return nil, fmt.Errorf("Unable to decode key in response: %s", err)
-		}
-		err = json.Unmarshal(jsonvalue, key)
-		if err != nil {
-			return nil, fmt.Errorf("Unable to decode key in response: %s", err)
-		}
-		key.createOnSave = false
-		keys[x] = key
-		x++
-	}
-
-	return keys, nil
+	return doKeysRequest(reqAddress, axleAddress)
 }
 
 // ApiCharts lists the top 100 keys and their hit rate for time period granularity.

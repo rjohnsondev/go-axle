@@ -118,7 +118,7 @@ func testUnlinkKey(t *testing.T) {
 }
 
 func testApiKeys(t *testing.T) {
-	keys, err := ApiKeys(TEST_API_AXLE_SERVER, TEST_API_NAME)
+	keys, err := ApiKeys(TEST_API_AXLE_SERVER, TEST_API_NAME, 0, 10)
 	if err != nil {
 		t.Errorf("Error listing keys: %v", err)
 		t.Fatal()

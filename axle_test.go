@@ -38,6 +38,8 @@ func TestAll(t *testing.T) {
 	testApiCharts(t)
 	testKeyApiCharts(t)
 	testKeyApis(t, k)
+	testKeyStats(t, k)
+	testKeys(t)
 	testUnlinkKey(t)
 	testDeleteKey(t)
 	kr := testNewKeyRing(t)

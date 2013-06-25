@@ -33,10 +33,10 @@ const (
 	API_FORMAT_JSON ApiFormat = "json"
 	API_FORMAT_XML  ApiFormat = "xml"
 
-	GRANULARITY_SECONDS Granularity = "seconds"
-	GRANULARITY_MINUTES Granularity = "minutes"
-	GRANULARITY_HOURS   Granularity = "hours"
-	GRANULARITY_DAYS    Granularity = "days"
+	GRANULARITY_SECONDS Granularity = "second"
+	GRANULARITY_MINUTES Granularity = "minute"
+	GRANULARITY_HOURS   Granularity = "hour"
+	GRANULARITY_DAYS    Granularity = "day"
 
 	HIT_TYPE_CACHED   HitType = "cached"
 	HIT_TYPE_UNCACHED HitType = "uncached"
@@ -222,6 +222,92 @@ func doChartsRequest(reqAddress string) (out map[string]int, err error) {
 	out = make(map[string]int, len(results))
 	for key, count := range results {
 		out[key] = int(count.(float64))
+	}
+
+	return out, nil
+}
+
+func doKeysRequest(reqAddress string, axleAddress string) (keys []*Key, err error) {
+
+	body, err := doHttpRequest("GET", reqAddress, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	responseMap := make(map[string]interface{})
+	err = json.Unmarshal(body, &responseMap)
+	if err != nil {
+		return nil, fmt.Errorf(
+			"Unable to unmarshal response from %s: %s",
+			reqAddress,
+			err.Error(),
+		)
+	}
+
+	resultsInterface, exists := responseMap["results"]
+	if !exists {
+		return nil, fmt.Errorf("Missing results from %s", reqAddress)
+	}
+	results, isValidCast := resultsInterface.(map[string]interface{})
+	if !isValidCast {
+		return nil, fmt.Errorf("Unable to cast to list of keys from %s", reqAddress)
+	}
+	keys = make([]*Key, len(results))
+	x := 0
+	for identifier, keyInterface := range results {
+		key := NewKey(axleAddress, identifier)
+		jsonvalue, err := json.Marshal(keyInterface)
+		if err != nil {
+			return nil, fmt.Errorf("Unable to decode key in response: %s", err)
+		}
+		err = json.Unmarshal(jsonvalue, key)
+		if err != nil {
+			return nil, fmt.Errorf("Unable to decode key in response: %s", err)
+		}
+		key.createOnSave = false
+		keys[x] = key
+		x++
+	}
+
+	return keys, nil
+}
+
+func doApisRequest(reqAddress string, axleAddress string) (out []*Api, err error) {
+	body, err := doHttpRequest("GET", reqAddress, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	response := make(map[string]interface{})
+	err = json.Unmarshal(body, &response)
+	if err != nil {
+		return nil, fmt.Errorf(
+			"Unable to unmarshal response: %s",
+			err.Error(),
+		)
+	}
+	response, validCast := response["results"].(map[string]interface{})
+	if !validCast {
+		return nil, fmt.Errorf(
+			"Unable to unmarshal response: %s",
+			err.Error(),
+		)
+	}
+	out = make([]*Api, len(response))
+	x := 0
+	for identifier, value := range response {
+		api := NewApi(axleAddress, identifier, "")
+		jsonvalue, err := json.Marshal(value)
+		if err != nil {
+			return nil, fmt.Errorf("Unable to decode api in response: %s", err.Error())
+		}
+		err = json.Unmarshal(jsonvalue, api)
+		if err != nil {
+			return nil, fmt.Errorf("Unable to decode api in response: %s", err.Error())
+		}
+		api.createOnSave = false
+		out[x] = api
+		x++
 	}
 
 	return out, nil

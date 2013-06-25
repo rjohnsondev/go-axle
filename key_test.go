@@ -84,4 +84,33 @@ func testKeyApis(t *testing.T, k *Key) {
 	}
 }
 
+func testKeyStats(t *testing.T, k *Key) {
+	anHourAgo, _ := time.ParseDuration("-1hr")
+	stats, err := k.Stats(
+		time.Now().Add(anHourAgo),
+		time.Now(),
+		GRANULARITY_DAYS,
+	)
+	if err != nil {
+		t.Errorf("Error gettings stats: %v", err)
+		t.Fatal()
+	}
+	if stats == nil {
+		t.Errorf("Empty stats returned")
+		t.Fatal()
+	}
+}
+
+func testKeys(t *testing.T) {
+	keys, err := Keys(TEST_API_AXLE_SERVER, 0, 10)
+	if err != nil {
+		t.Errorf("Error getting keys: %v", err)
+		t.Fatal()
+	}
+	if len(keys) <= 0 {
+		t.Errorf("Expected to get at least one key!")
+		t.Fatal()
+	}
+}
+
 /* ex: set noexpandtab: */
