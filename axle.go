@@ -1,9 +1,6 @@
 // Package goaxle provides bindings to the ApiAxle management API.
 package goaxle
 
-// TODO: Tell phil to update the docs with correct cURL request:
-//       curl -X POST 'http://localhost:28902/v1/api/test' -d '{"endPoint":"testapi.api.local"}' -H "Content-Type:application/json"
-
 import (
 	"bytes"
 	"fmt"

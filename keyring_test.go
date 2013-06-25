@@ -78,4 +78,37 @@ func testKeyRingStats(t *testing.T, kr *KeyRing) {
 	}
 }
 
+func testKeyRingUnlinkKey(t *testing.T) {
+	key, err := KeyRingUnlinkKey(
+		TEST_API_AXLE_SERVER,
+		TEST_KEYRING_NAME,
+		TEST_KEY_NAME,
+	)
+	if err != nil {
+		t.Errorf("Error getting keyring stats: %v", err)
+	}
+	if key.Identifier != TEST_KEY_NAME {
+		t.Errorf("Error, unlinked key was not returned correctly")
+	}
+}
+
+func testKeyRings(t *testing.T) {
+	keyrings, err := KeyRings(TEST_API_AXLE_SERVER, 0, 10)
+	if err != nil {
+		t.Errorf("Error geting list of keyrings: %v", err)
+	}
+	if len(keyrings) != 1 {
+		t.Errorf("Incorrect number of keyrings returned: %v", len(keyrings))
+	}
+}
+func testKeyRingsEmpty(t *testing.T) {
+	keyrings, err := KeyRings(TEST_API_AXLE_SERVER, 0, 10)
+	if err != nil {
+		t.Errorf("Error geting list of keyrings: %v", err)
+	}
+	if len(keyrings) != 1 {
+		t.Errorf("Incorrect number of keyrings returned: %v", len(keyrings))
+	}
+}
+
 /* ex: set noexpandtab: */

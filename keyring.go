@@ -222,6 +222,38 @@ func KeyRingLinkKey(axleAddress string, keyRingIdentifier string, keyIdentifier 
 	return key, nil
 }
 
+
+// UnlinkKey disassociates the provided key with this KeyRing.
+func (this *KeyRing) UnlinkKey(keyIdentifier string) (key *Key, err error) {
+	return KeyRingUnlinkKey(this.axleAddress, this.Identifier, keyIdentifier)
+}
+
+// UnlinkKey disassociates the provided key with this API.
+func KeyRingUnlinkKey(axleAddress string, keyRingIdentifier string, keyIdentifier string) (key *Key, err error) {
+	reqAddress := fmt.Sprintf(
+		"%s%skeyring/%s/unlinkkey/%s",
+		axleAddress,
+		VERSION_ENDPOINT,
+		url.QueryEscape(keyRingIdentifier),
+		url.QueryEscape(keyIdentifier),
+	)
+
+	body, err := doHttpRequest("PUT", reqAddress, []byte("{}"))
+	if err != nil {
+		return nil, err
+	}
+
+	key = NewKey(axleAddress, keyIdentifier)
+	err = populateKeyFromResponse(&key, body, []string{"results"})
+	if err != nil {
+		return nil, err
+	}
+	key.createOnSave = false
+
+	return key, nil
+}
+
+
 // List keys belonging to an KEYRING.
 func (this *KeyRing) Keys(from int, to int) (keys []*Key, err error) {
 	return KeyRingKeys(this.axleAddress, this.Identifier, from, to)
@@ -271,6 +303,55 @@ func KeyRingStats(axleAddress string, keyRingIdentifier string, from time.Time, 
 	}
 
 	return doStatsRequest(reqAddress)
+}
+
+func KeyRings(axleAddress string, from int, to int) (out []*KeyRing, err error) {
+	reqAddress := fmt.Sprintf(
+		"%s%skeyrings?resolve=true&from=%d&to=%d",
+		axleAddress,
+		VERSION_ENDPOINT,
+		from,
+		to,
+	)
+
+	body, err := doHttpRequest("GET", reqAddress, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	response := make(map[string]interface{})
+	err = json.Unmarshal(body, &response)
+	if err != nil {
+		return nil, fmt.Errorf(
+			"Unable to unmarshal response: %s",
+			err.Error(),
+		)
+	}
+	response, validCast := response["results"].(map[string]interface{})
+	if !validCast {
+		return nil, fmt.Errorf(
+			"Unable to unmarshal response: %s",
+			err.Error(),
+		)
+	}
+	out = make([]*KeyRing, len(response))
+	x := 0
+	for identifier, value := range response {
+		keyring := NewKeyRing(axleAddress, identifier)
+		jsonvalue, err := json.Marshal(value)
+		if err != nil {
+			return nil, fmt.Errorf("Unable to decode keyring in response: %s", err.Error())
+		}
+		err = json.Unmarshal(jsonvalue, keyring)
+		if err != nil {
+			return nil, fmt.Errorf("Unable to decode keyring in response: %s", err.Error())
+		}
+		keyring.createOnSave = false
+		out[x] = keyring
+		x++
+	}
+
+	return out, nil
 }
 
 /* ex: set noexpandtab: */
