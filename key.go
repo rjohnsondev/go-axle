@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"time"
+	"net/url"
 )
 
 type Key struct {
@@ -59,7 +60,7 @@ func (this *Key) Save() (err error) {
 		"%s%skey/%s",
 		this.axleAddress,
 		VERSION_ENDPOINT,
-		this.Identifier,
+		url.QueryEscape(this.Identifier),
 	)
 
 	// update the updatedAt timestamp
@@ -97,7 +98,7 @@ func (this *Key) Save() (err error) {
 // GetKey retrieves an existing api object from the server.
 func GetKey(axleAddress string, identifier string) (out *Key, err error) {
 
-	reqAddress := fmt.Sprintf("%s%skey/%s", axleAddress, VERSION_ENDPOINT, identifier)
+	reqAddress := fmt.Sprintf("%s%skey/%s", axleAddress, VERSION_ENDPOINT, url.QueryEscape(identifier))
 	body, err := doHttpRequest("GET", reqAddress, nil)
 	if err != nil {
 		return nil, err
@@ -168,7 +169,7 @@ func (this *Key) String() string {
 		"%s%skey/%s",
 		this.axleAddress,
 		VERSION_ENDPOINT,
-		this.Identifier,
+		url.QueryEscape(this.Identifier),
 	)
 	return fmt.Sprintf("Key - %s: %s", reqAddress, string(out))
 }
@@ -176,7 +177,7 @@ func (this *Key) String() string {
 // DeleteKey removes the identified Key.  Any existing objects represting this
 // Key will error on Save().
 func DeleteKey(axleAddress string, identifier string) (err error) {
-	reqAddress := fmt.Sprintf("%s%skey/%s", axleAddress, VERSION_ENDPOINT, identifier)
+	reqAddress := fmt.Sprintf("%s%skey/%s", axleAddress, VERSION_ENDPOINT, url.QueryEscape(identifier))
 
 	body, err := doHttpRequest("DELETE", reqAddress, nil)
 	if err != nil {
@@ -223,7 +224,7 @@ func KeyApiCharts(axleAddress string, keyIdentifier string, granularity Granular
 		"%s%skey/%s/apicharts?granularity=%s",
 		axleAddress,
 		VERSION_ENDPOINT,
-		keyIdentifier,
+		url.QueryEscape(keyIdentifier),
 		granularity,
 	)
 

@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"time"
+	"net/url"
 )
 
 type KeyRing struct {
@@ -42,7 +43,7 @@ func (this *KeyRing) Save() (err error) {
 		"%s%skeyring/%s",
 		this.axleAddress,
 		VERSION_ENDPOINT,
-		this.Identifier,
+		url.QueryEscape(this.Identifier),
 	)
 
 	// update the updatedAt timestamp
@@ -82,7 +83,7 @@ func (this *KeyRing) Save() (err error) {
 // GetKeyRing retrieves an existing api object from the server.
 func GetKeyRing(axleAddress string, identifier string) (out *KeyRing, err error) {
 
-	reqAddress := fmt.Sprintf("%s%skeyring/%s", axleAddress, VERSION_ENDPOINT, identifier)
+	reqAddress := fmt.Sprintf("%s%skeyring/%s", axleAddress, VERSION_ENDPOINT, url.QueryEscape(identifier))
 	body, err := doHttpRequest("GET", reqAddress, nil)
 	if err != nil {
 		return nil, err
@@ -151,7 +152,7 @@ func (this *KeyRing) String() string {
 		"%s%skeyring/%s",
 		this.axleAddress,
 		VERSION_ENDPOINT,
-		this.Identifier,
+		url.QueryEscape(this.Identifier),
 	)
 	return fmt.Sprintf("KeyRing - %s: %s", reqAddress, string(out))
 }
@@ -159,7 +160,7 @@ func (this *KeyRing) String() string {
 // DeleteKeyRing removes the identified KeyRing.  Any existing objects represting this
 // KeyRing will error on Save().
 func DeleteKeyRing(axleAddress string, identifier string) (err error) {
-	reqAddress := fmt.Sprintf("%s%skeyring/%s", axleAddress, VERSION_ENDPOINT, identifier)
+	reqAddress := fmt.Sprintf("%s%skeyring/%s", axleAddress, VERSION_ENDPOINT, url.QueryEscape(identifier))
 
 	body, err := doHttpRequest("DELETE", reqAddress, nil)
 	if err != nil {

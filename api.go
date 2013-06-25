@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"time"
 	"strconv"
+	"net/url"
 )
 
 type Api struct {
@@ -118,7 +119,7 @@ func NewApi(axleAddress string, identifier string, endPoint string) (out *Api) {
 // GetAPI retrieves an existing api object from the server.
 func GetApi(axleAddress string, identifier string) (out *Api, err error) {
 
-	reqAddress := fmt.Sprintf("%s%sapi/%s", axleAddress, VERSION_ENDPOINT, identifier)
+	reqAddress := fmt.Sprintf("%s%sapi/%s", axleAddress, VERSION_ENDPOINT, url.QueryEscape(identifier))
 	body, err := doHttpRequest("GET", reqAddress, nil)
 	if err != nil {
 		return nil, err
@@ -138,7 +139,7 @@ func GetApi(axleAddress string, identifier string) (out *Api, err error) {
 // To modify an existing API, be sure to retrieve it with GetApi, otherwise
 // the library will attempt to create a new API of the same name.
 func (this *Api) Save() (err error) {
-	reqAddress := fmt.Sprintf("%s%sapi/%s", this.axleAddress, VERSION_ENDPOINT, this.Identifier)
+	reqAddress := fmt.Sprintf("%s%sapi/%s", this.axleAddress, VERSION_ENDPOINT, url.QueryEscape(this.Identifier))
 
 	// update the updatedAt timestamp
 	this.UpdatedAt = float64(time.Now().UnixNano() / (1000 * 1000))
@@ -192,7 +193,7 @@ func (this *Api) String() string {
 		"%s%sapi/%s",
 		this.axleAddress,
 		VERSION_ENDPOINT,
-		this.Identifier,
+		url.QueryEscape(this.Identifier),
 	)
 	return fmt.Sprintf("Api - %s: %s", reqAddress, string(out))
 }
@@ -208,8 +209,8 @@ func LinkKey(axleAddress string, apiIdentifier string, keyIdentifier string) (ke
 		"%s%sapi/%s/linkkey/%s",
 		axleAddress,
 		VERSION_ENDPOINT,
-		apiIdentifier,
-		keyIdentifier,
+		url.QueryEscape(apiIdentifier),
+		url.QueryEscape(keyIdentifier),
 	)
 
 	body, err := doHttpRequest("PUT", reqAddress, []byte("{}"))
@@ -238,8 +239,8 @@ func UnlinkKey(axleAddress string, apiIdentifier string, keyIdentifier string) (
 		"%s%sapi/%s/unlinkkey/%s",
 		axleAddress,
 		VERSION_ENDPOINT,
-		apiIdentifier,
-		keyIdentifier,
+		url.QueryEscape(apiIdentifier),
+		url.QueryEscape(keyIdentifier),
 	)
 
 	body, err := doHttpRequest("PUT", reqAddress, []byte("{}"))
@@ -268,7 +269,7 @@ func ApiKeys(axleAddress string, apiIdentifier string) (keys []*Key, err error) 
 		"%s%sapi/%s/keys?resolve=true",
 		axleAddress,
 		VERSION_ENDPOINT,
-		apiIdentifier,
+		url.QueryEscape(apiIdentifier),
 	)
 
 	body, err := doHttpRequest("GET", reqAddress, nil)
@@ -365,7 +366,7 @@ func ApiKeyCharts(axleAddress string, apiIdentifier string, granularity Granular
 		"%s%sapi/%s/keycharts?granularity=%s",
 		axleAddress,
 		VERSION_ENDPOINT,
-		apiIdentifier,
+		url.QueryEscape(apiIdentifier),
 		granularity,
 	)
 
@@ -413,7 +414,7 @@ func ApiStats(axleAddress string, apiIdentifier string, from time.Time, to time.
 		"%s%sapi/%s/stats?from=%d&to=%d&granularity=%s",
 		axleAddress,
 		VERSION_ENDPOINT,
-		apiIdentifier,
+		url.QueryEscape(apiIdentifier),
 		from.Unix(),
 		to.Unix(),
 		granularity,
@@ -531,7 +532,7 @@ func populateApiFromResponse(api **Api, body []byte, detailsLocation []string) (
 // DeleteApi removes the identified API.  Any existing objects represting this
 // API will error on Save().
 func DeleteApi(axleAddress string, identifier string) (err error) {
-	reqAddress := fmt.Sprintf("%s%sapi/%s", axleAddress, VERSION_ENDPOINT, identifier)
+	reqAddress := fmt.Sprintf("%s%sapi/%s", axleAddress, VERSION_ENDPOINT, url.QueryEscape(identifier))
 
 	body, err := doHttpRequest("DELETE", reqAddress, nil)
 	if err != nil {

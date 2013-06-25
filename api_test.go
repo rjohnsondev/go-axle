@@ -162,7 +162,7 @@ func testApis(t *testing.T) {
 		t.Errorf("Error getting apis: %v", err)
 		t.Fatal()
 	}
-	if len(apis) != 1 {
+	if len(apis) <= 0 {
 		t.Errorf("Wrong number of apis returned %d", len(apis))
 		t.Fatal()
 	}
