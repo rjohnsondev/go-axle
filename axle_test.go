@@ -45,6 +45,7 @@ func TestAll(t *testing.T) {
 	testUpdateKeyRing(t, kr)
 	testKeyRingLinkKey(t)
 	testKeyRingKeys(t, kr)
+	testKeyRingStats(t, kr)
 	testUnlinkKey(t)
 	testDeleteKey(t)
 	testDeleteKeyRing(t)

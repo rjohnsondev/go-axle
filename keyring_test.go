@@ -2,6 +2,8 @@ package goaxle
 
 import (
 	"testing"
+	//"fmt"
+	"time"
 )
 
 func testNewKeyRing(t *testing.T) (k *KeyRing) {
@@ -58,6 +60,21 @@ func testKeyRingLinkKey(t *testing.T) {
 	}
 	if key.Identifier != TEST_KEY_NAME {
 		t.Errorf("Incorrect key identifier returned from linking: %v", key.Identifier)
+	}
+}
+
+func testKeyRingStats(t *testing.T, kr *KeyRing) {
+	anHourAgo, _ := time.ParseDuration("-1hr")
+	stats, err := kr.Stats(
+		time.Now().Add(anHourAgo),
+		time.Now(),
+		GRANULARITY_DAYS,
+	)
+	if err != nil {
+		t.Errorf("Error getting keyring stats: %v", err)
+	}
+	if stats == nil {
+		t.Errorf("No stats returned for %v", kr.Identifier)
 	}
 }
 

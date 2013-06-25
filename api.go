@@ -168,11 +168,11 @@ func (this *Api) String() string {
 
 // LinkKey links the provided key with this API.
 func (this *Api) LinkKey(keyIdentifier string) (key *Key, err error) {
-	return LinkKey(this.axleAddress, this.Identifier, keyIdentifier)
+	return ApiLinkKey(this.axleAddress, this.Identifier, keyIdentifier)
 }
 
 // LinkKey links the provided key with this API.
-func LinkKey(axleAddress string, apiIdentifier string, keyIdentifier string) (key *Key, err error) {
+func ApiLinkKey(axleAddress string, apiIdentifier string, keyIdentifier string) (key *Key, err error) {
 	reqAddress := fmt.Sprintf(
 		"%s%sapi/%s/linkkey/%s",
 		axleAddress,
@@ -198,11 +198,11 @@ func LinkKey(axleAddress string, apiIdentifier string, keyIdentifier string) (ke
 
 // UnlinkKey disassociates the provided key with this API.
 func (this *Api) UnlinkKey(keyIdentifier string) (key *Key, err error) {
-	return UnlinkKey(this.axleAddress, this.Identifier, keyIdentifier)
+	return ApiUnlinkKey(this.axleAddress, this.Identifier, keyIdentifier)
 }
 
 // UnlinkKey disassociates the provided key with this API.
-func UnlinkKey(axleAddress string, apiIdentifier string, keyIdentifier string) (key *Key, err error) {
+func ApiUnlinkKey(axleAddress string, apiIdentifier string, keyIdentifier string) (key *Key, err error) {
 	reqAddress := fmt.Sprintf(
 		"%s%sapi/%s/unlinkkey/%s",
 		axleAddress,
@@ -295,7 +295,7 @@ func ApiStats(axleAddress string, apiIdentifier string, from time.Time, to time.
 	)
 
 	if forkey != "" {
-		reqAddress += "&forkey=" + forkey
+		reqAddress += "&forkey=" + url.QueryEscape(forkey)
 	}
 
 	return doStatsRequest(reqAddress)

@@ -265,7 +265,7 @@ func KeyStats(axleAddress string, keyIdentifier string, from time.Time, to time.
 	)
 
 	if forapi != "" {
-		reqAddress += "&forapi=" + forapi
+		reqAddress += "&forapi=" + url.QueryEscape(forapi)
 	}
 
 	return doStatsRequest(reqAddress)

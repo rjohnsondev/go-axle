@@ -241,5 +241,36 @@ func KeyRingKeys(axleAddress string, identifier string, from int, to int) (keys 
 	return doKeysRequest(reqAddress, axleAddress)
 }
 
+func (this *KeyRing) Stats(from time.Time, to time.Time, granularity Granularity) (stats map[HitType]map[time.Time]map[int]int, err error) {
+	return KeyRingStats(this.axleAddress, this.Identifier, from, to, "", "", granularity)
+}
+func (this *KeyRing) StatsForKey(from time.Time, to time.Time, forkey string, granularity Granularity) (stats map[HitType]map[time.Time]map[int]int, err error) {
+	return KeyRingStats(this.axleAddress, this.Identifier, from, to, forkey, "", granularity)
+}
+func (this *KeyRing) StatsForApi(from time.Time, to time.Time, forapi string, granularity Granularity) (stats map[HitType]map[time.Time]map[int]int, err error) {
+	return KeyRingStats(this.axleAddress, this.Identifier, from, to, "", forapi, granularity)
+}
+
+func KeyRingStats(axleAddress string, keyRingIdentifier string, from time.Time, to time.Time, forapi string, forkey string, granularity Granularity) (stats map[HitType]map[time.Time]map[int]int, err error) {
+
+	reqAddress := fmt.Sprintf(
+		"%s%skeyring/%s/stats?from=%d&to=%d&granularity=%s",
+		axleAddress,
+		VERSION_ENDPOINT,
+		url.QueryEscape(keyRingIdentifier),
+		from.Unix(),
+		to.Unix(),
+		granularity,
+	)
+
+	if forkey != "" {
+		reqAddress += "&forkey=" + url.QueryEscape(forkey)
+	}
+	if forapi != "" {
+		reqAddress += "&forapi=" + url.QueryEscape(forapi)
+	}
+
+	return doStatsRequest(reqAddress)
+}
 
 /* ex: set noexpandtab: */

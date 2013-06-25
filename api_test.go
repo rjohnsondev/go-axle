@@ -110,7 +110,7 @@ func testLinkKey(t *testing.T, api *Api) {
 }
 
 func testUnlinkKey(t *testing.T) {
-	_, err := UnlinkKey(TEST_API_AXLE_SERVER, TEST_API_NAME, TEST_KEY_NAME)
+	_, err := ApiUnlinkKey(TEST_API_AXLE_SERVER, TEST_API_NAME, TEST_KEY_NAME)
 	if err != nil {
 		t.Errorf("Error unlinking key: %v", err)
 		t.Fatal()
