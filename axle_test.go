@@ -22,6 +22,7 @@ func TestAll(t *testing.T) {
 	DeleteKey(TEST_API_AXLE_SERVER, TEST_KEY_NAME)
 	DeleteKeyRing(TEST_API_AXLE_SERVER, TEST_KEYRING_NAME)
 
+	testPing(t)
 	testInfo(t)
 	testGetNonExistentApi(t)
 	testCreateApi(t)
@@ -54,6 +55,13 @@ func TestAll(t *testing.T) {
 	testDeleteKey(t)
 	testDeleteKeyRing(t)
 	testDeleteApi(t, api)
+}
+
+func testPing(t *testing.T) {
+	err := Ping(TEST_API_AXLE_SERVER)
+	if err != nil {
+		t.Errorf("Failed to get info: %s", err)
+	}
 }
 
 func testInfo(t *testing.T) {

@@ -64,6 +64,26 @@ func Info(axleAddress string) (info map[string]interface{}, err error) {
 	return nil, fmt.Errorf("Unable to get axle info, missing results in response")
 }
 
+func Ping(axleAddress string) (err error) {
+	reqAddress := fmt.Sprintf("%s%sping", axleAddress, VERSION_ENDPOINT)
+	resp, err := http.Get(reqAddress)
+	if err != nil {
+		return fmt.Errorf("Unable to ping server at %v: %v", axleAddress, err)
+	}
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return fmt.Errorf("Unable to ping server at %v: %v", axleAddress, err)
+	}
+	if string(body) != "pong" {
+		return fmt.Errorf(
+			"ApiAxle server at %v didn't respond with pong, but with \"%v\"",
+			axleAddress,
+			string(body),
+		)
+	}
+	return nil
+}
+
 // doHttpRequest performs verb on reqAddress, optionally posting postData.
 // It returns the full page contents as a slice, and / or an error object
 // describing any issues encountered.
