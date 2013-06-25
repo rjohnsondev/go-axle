@@ -17,7 +17,7 @@ func testNewKeyRing(t *testing.T) (k *KeyRing) {
 func testGetKeyRing(t *testing.T) {
 	kr, err := GetKeyRing(TEST_API_AXLE_SERVER, TEST_KEYRING_NAME)
 	if err != nil {
-		t.Errorf("Unable to save keyRing: %v", err)
+		t.Errorf("Unable to get KeyRing: %v", err)
 		t.Fatal()
 	}
 	if kr == nil {
@@ -38,6 +38,26 @@ func testDeleteKeyRing(t *testing.T) {
 	err := DeleteKeyRing(TEST_API_AXLE_SERVER, TEST_KEYRING_NAME)
 	if err != nil {
 		t.Errorf("Unable to delete keyRing: %v", err)
+	}
+}
+
+func testKeyRingKeys(t *testing.T, kr *KeyRing) {
+	keys, err := KeyRingKeys(TEST_API_AXLE_SERVER, TEST_KEYRING_NAME, 0, 10)
+	if err != nil {
+		t.Errorf("Error getting keys for keyring: %v", err)
+	}
+	if len(keys) != 1 {
+		t.Errorf("Wrong number of keys returned for keyring: %d", len(keys))
+	}
+}
+
+func testKeyRingLinkKey(t *testing.T) {
+	key, err := KeyRingLinkKey(TEST_API_AXLE_SERVER, TEST_KEYRING_NAME, TEST_KEY_NAME)
+	if err != nil {
+		t.Errorf("Error linking key to keyring: %v", err)
+	}
+	if key.Identifier != TEST_KEY_NAME {
+		t.Errorf("Incorrect key identifier returned from linking: %v", key.Identifier)
 	}
 }
 

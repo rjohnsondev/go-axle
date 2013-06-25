@@ -197,4 +197,49 @@ func DeleteKeyRing(axleAddress string, identifier string) (err error) {
 	return nil
 }
 
+func KeyRingLinkKey(axleAddress string, keyRingIdentifier string, keyIdentifier string) (key *Key, err error) {
+
+	reqAddress := fmt.Sprintf(
+		"%s%skeyring/%s/linkkey/%s",
+		axleAddress,
+		VERSION_ENDPOINT,
+		url.QueryEscape(keyRingIdentifier),
+		url.QueryEscape(keyIdentifier),
+	)
+
+	body, err := doHttpRequest("PUT", reqAddress, []byte("{}"))
+	if err != nil {
+		return nil, err
+	}
+
+	key = NewKey(axleAddress, keyIdentifier)
+	err = populateKeyFromResponse(&key, body, []string{"results"})
+	if err != nil {
+		return nil, err
+	}
+	key.createOnSave = false
+
+	return key, nil
+}
+
+// List keys belonging to an KEYRING.
+func (this *KeyRing) Keys(from int, to int) (keys []*Key, err error) {
+	return KeyRingKeys(this.axleAddress, this.Identifier, from, to)
+}
+// List keys belonging to an KEYRING.
+func KeyRingKeys(axleAddress string, identifier string, from int, to int) (keys []*Key, err error) {
+
+	reqAddress := fmt.Sprintf(
+		"%s%skeyring/%s/keys?resolve=true&from=%d&to=%d",
+		axleAddress,
+		VERSION_ENDPOINT,
+		url.QueryEscape(identifier),
+		from,
+		to,
+	)
+
+	return doKeysRequest(reqAddress, axleAddress)
+}
+
+
 /* ex: set noexpandtab: */
