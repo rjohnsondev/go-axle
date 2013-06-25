@@ -113,4 +113,16 @@ func testKeys(t *testing.T) {
 	}
 }
 
+func testKeyCharts(t *testing.T) {
+	charts, err := KeyCharts(TEST_API_AXLE_SERVER, GRANULARITY_MINUTES)
+	if err != nil {
+		t.Errorf("Error getting key charts: %v", err)
+		t.Fatal()
+	}
+	if charts == nil {
+		t.Errorf("Missing chart information for keys!")
+		t.Fatal()
+	}
+}
+
 /* ex: set noexpandtab: */

@@ -131,7 +131,7 @@ func testApiKeys(t *testing.T) {
 
 // TODO: Add checks for actual values, but this requires a
 //		 mechanism to get usage stats into the server.
-func testKeyCharts(t *testing.T, api *Api) {
+func testApiKeyCharts(t *testing.T, api *Api) {
 	_, err := api.KeyCharts(GRANULARITY_MINUTES)
 	if err != nil {
 		t.Errorf("Error getting chart: %v", err)

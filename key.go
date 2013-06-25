@@ -231,6 +231,19 @@ func KeyApiCharts(axleAddress string, keyIdentifier string, granularity Granular
 	return doChartsRequest(reqAddress)
 }
 
+// Get the most used keys and their hit counts.
+func KeyCharts(axleAddress string, granularity Granularity) (out map[string]int, err error) {
+	reqAddress := fmt.Sprintf(
+		"%s%skeys/charts?granularity=%s",
+		axleAddress,
+		VERSION_ENDPOINT,
+		granularity,
+	)
+
+	return doChartsRequest(reqAddress)
+}
+
+
 // List apis belonging to a key.
 func (this *Key) Apis() (out []*Api, err error) {
 	return KeyApis(this.axleAddress, this.Identifier)
