@@ -73,7 +73,15 @@ func testKeyApiCharts(t *testing.T) {
 }
 
 func testKeyApis(t *testing.T, k *Key) {
-
+	apis, err := k.Apis()
+	if err != nil {
+		t.Errorf("Error getting apis for key: %v", err)
+		t.Fatal()
+	}
+	if len(apis) != 1 {
+		t.Errorf("Incorrect number of APIs returned for key %v", len(apis))
+		t.Fatal()
+	}
 }
 
 /* ex: set noexpandtab: */

@@ -259,8 +259,55 @@ func KeyApiCharts(axleAddress string, keyIdentifier string, granularity Granular
 	return out, nil
 }
 
-func KeyApis(axleAddress string, keyIdentifier string) (apis []*Api, err error) {
-	return nil, nil
+// List apis belonging to a key.
+func (this *Key) Apis() (out []*Api, err error) {
+	return KeyApis(this.axleAddress, this.Identifier)
+}
+func KeyApis(axleAddress string, keyIdentifier string) (out []*Api, err error) {
+	reqAddress := fmt.Sprintf(
+		"%s%skey/%s/apis?resolve=true",
+		axleAddress,
+		VERSION_ENDPOINT,
+		url.QueryEscape(keyIdentifier),
+	)
+	body, err := doHttpRequest("GET", reqAddress, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	response := make(map[string]interface{})
+	err = json.Unmarshal(body, &response)
+	if err != nil {
+		return nil, fmt.Errorf(
+			"Unable to unmarshal response: %s",
+			err.Error(),
+		)
+	}
+	response, validCast := response["results"].(map[string]interface{})
+	if !validCast {
+		return nil, fmt.Errorf(
+			"Unable to unmarshal response: %s",
+			err.Error(),
+		)
+	}
+	out = make([]*Api, len(response))
+	x := 0
+	for identifier, value := range response {
+		api := NewApi(axleAddress, identifier, "")
+		jsonvalue, err := json.Marshal(value)
+		if err != nil {
+			return nil, fmt.Errorf("Unable to decode api in response: %s", err.Error())
+		}
+		err = json.Unmarshal(jsonvalue, api)
+		if err != nil {
+			return nil, fmt.Errorf("Unable to decode api in response: %s", err.Error())
+		}
+		api.createOnSave = false
+		out[x] = api
+		x++
+	}
+
+	return out, nil
 }
 
 /* ex: set noexpandtab: */
