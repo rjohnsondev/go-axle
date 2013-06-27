@@ -3,8 +3,8 @@ package goaxle
 import (
 	"encoding/json"
 	"fmt"
-	"time"
 	"net/url"
+	"time"
 )
 
 type Api struct {
@@ -279,10 +279,12 @@ func ApiKeyCharts(axleAddress string, apiIdentifier string, granularity Granular
 func (this *Api) Stats(from time.Time, to time.Time, granularity Granularity) (stats map[HitType]map[time.Time]map[int]int, err error) {
 	return ApiStats(this.axleAddress, this.Identifier, from, to, "", granularity)
 }
+
 //  Get stats for an api
 func (this *Api) StatsForKey(from time.Time, to time.Time, forkey string, granularity Granularity) (stats map[HitType]map[time.Time]map[int]int, err error) {
 	return ApiStats(this.axleAddress, this.Identifier, from, to, forkey, granularity)
 }
+
 //  Get stats for an api
 func ApiStats(axleAddress string, apiIdentifier string, from time.Time, to time.Time, forkey string, granularity Granularity) (stats map[HitType]map[time.Time]map[int]int, err error) {
 
