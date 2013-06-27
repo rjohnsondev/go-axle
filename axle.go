@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"strconv"
 	"time"
+	"strings"
 )
 
 // API protocol type.
@@ -103,6 +104,9 @@ func doHttpRequest(verb string, reqAddress string, postData []byte) (body []byte
 			err.Error(),
 		)
 	}
+	path := strings.TrimPrefix(req.URL.Scheme, reqAddress)
+	path = strings.Split(reqAddress, "?")[0]
+	req.URL.Opaque = path
 
 	req.Header = map[string][]string{
 		"Content-type": {"application/json"},
