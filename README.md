@@ -1,25 +1,30 @@
-API Axle client for Go (golang)
+ApiAxle client for Go (golang)
 -------------------------------
 
 [![Build Status](https://travis-ci.org/rjohnsondev/go-axle.png)](https://travis-ci.org/rjohnsondev/go-axle) 
 [![Coverage Status](https://coveralls.io/repos/rjohnsondev/go-axle/badge.png?branch=HEAD)](https://coveralls.io/r/rjohnsondev/go-axle?branch=HEAD)
 
-Features
-============
+## Features
 
 Should provide complete programmatic access to all API methods as documented here: http://apiaxle.com/api.html
 
-Installation
-============
+## Installation
 
 This should get you started:
 
     go get github.com/rjohnsondev/go-axle
 
-Usage
-=====
+## Docs
 
-This example program will connect to the api-axle server running on port 2890, create a new test API, a new key and link the key to the API.
+Generated documentation can be viewed by running:
+
+    godoc -http :3000
+
+then navigating to http://localhost:3000/pkg/go-axle/ when the library is in your $GOPATH.
+
+## Usage
+
+This example program will connect to the ApiAxle server running on port 28902, create a new test API, a new key and link the key to the API.
 
 ```go
 package main

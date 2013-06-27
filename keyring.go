@@ -3,8 +3,8 @@ package goaxle
 import (
 	"encoding/json"
 	"fmt"
-	"time"
 	"net/url"
+	"time"
 )
 
 type KeyRing struct {
@@ -201,6 +201,7 @@ func DeleteKeyRing(axleAddress string, identifier string) (err error) {
 func (this *KeyRing) LinkKey(keyIdentifier string) (key *Key, err error) {
 	return KeyRingLinkKey(this.axleAddress, this.Identifier, keyIdentifier)
 }
+
 // Associate a key with a KEYRING.
 func KeyRingLinkKey(axleAddress string, keyRingIdentifier string, keyIdentifier string) (key *Key, err error) {
 
@@ -226,7 +227,6 @@ func KeyRingLinkKey(axleAddress string, keyRingIdentifier string, keyIdentifier 
 
 	return key, nil
 }
-
 
 // UnlinkKey disassociates the provided key with this KeyRing.
 func (this *KeyRing) UnlinkKey(keyIdentifier string) (key *Key, err error) {
@@ -258,11 +258,11 @@ func KeyRingUnlinkKey(axleAddress string, keyRingIdentifier string, keyIdentifie
 	return key, nil
 }
 
-
 // List keys belonging to an KEYRING.
 func (this *KeyRing) Keys(from int, to int) (keys []*Key, err error) {
 	return KeyRingKeys(this.axleAddress, this.Identifier, from, to)
 }
+
 // List keys belonging to an KEYRING.
 func KeyRingKeys(axleAddress string, identifier string, from int, to int) (keys []*Key, err error) {
 
@@ -282,10 +282,12 @@ func KeyRingKeys(axleAddress string, identifier string, from int, to int) (keys 
 func (this *KeyRing) Stats(from time.Time, to time.Time, granularity Granularity) (stats map[HitType]map[time.Time]map[int]int, err error) {
 	return KeyRingStats(this.axleAddress, this.Identifier, from, to, "", "", granularity)
 }
+
 // Get stats for an keyring
 func (this *KeyRing) StatsForKey(from time.Time, to time.Time, forkey string, granularity Granularity) (stats map[HitType]map[time.Time]map[int]int, err error) {
 	return KeyRingStats(this.axleAddress, this.Identifier, from, to, forkey, "", granularity)
 }
+
 // Get stats for an keyring
 func (this *KeyRing) StatsForApi(from time.Time, to time.Time, forapi string, granularity Granularity) (stats map[HitType]map[time.Time]map[int]int, err error) {
 	return KeyRingStats(this.axleAddress, this.Identifier, from, to, "", forapi, granularity)

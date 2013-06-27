@@ -3,12 +3,12 @@ package goaxle
 
 import (
 	"bytes"
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"net/http"
-	"time"
-	"encoding/json"
 	"strconv"
+	"time"
 )
 
 // API protocol type.
@@ -56,7 +56,7 @@ func Info(axleAddress string) (info map[string]interface{}, err error) {
 	if resp, exists := out["results"]; exists {
 		// cast it on
 		info, isValidCast := resp.(map[string]interface{})
-		if (!isValidCast) {
+		if !isValidCast {
 			return nil, fmt.Errorf("Unable to get axle info, results was not a map")
 		}
 		return info, nil
@@ -151,7 +151,6 @@ func parseFloatToTime(theTime float64) time.Time {
 	return time.Unix(seconds, nanoSeconds)
 }
 
-
 func doStatsRequest(reqAddress string) (stats map[HitType]map[time.Time]map[int]int, err error) {
 	body, err := doHttpRequest("GET", reqAddress, nil)
 	if err != nil {
@@ -209,7 +208,6 @@ func doStatsRequest(reqAddress string) (stats map[HitType]map[time.Time]map[int]
 
 	return stats, nil
 }
-
 
 func doChartsRequest(reqAddress string) (out map[string]int, err error) {
 

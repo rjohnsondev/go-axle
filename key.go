@@ -3,8 +3,8 @@ package goaxle
 import (
 	"encoding/json"
 	"fmt"
-	"time"
 	"net/url"
+	"time"
 )
 
 type Key struct {
@@ -218,6 +218,7 @@ func DeleteKey(axleAddress string, identifier string) (err error) {
 func (this *Key) ApiCharts(granularity Granularity) (out map[string]int, err error) {
 	return KeyApiCharts(this.axleAddress, this.Identifier, granularity)
 }
+
 // KeyApiCharts lists the top 100 apis for the specified key and their hit rate for time period granularity.
 func KeyApiCharts(axleAddress string, keyIdentifier string, granularity Granularity) (out map[string]int, err error) {
 	reqAddress := fmt.Sprintf(
@@ -261,6 +262,7 @@ func KeyApis(axleAddress string, keyIdentifier string) (out []*Api, err error) {
 func (this *Key) Stats(from time.Time, to time.Time, granularity Granularity) (stats map[HitType]map[time.Time]map[int]int, err error) {
 	return KeyStats(this.axleAddress, this.Identifier, from, to, "", granularity)
 }
+
 // Get the real time hits for a key.
 func (this *Key) StatsForApi(from time.Time, to time.Time, forapi string, granularity Granularity) (stats map[HitType]map[time.Time]map[int]int, err error) {
 	return KeyStats(this.axleAddress, this.Identifier, from, to, forapi, granularity)
