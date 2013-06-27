@@ -1,5 +1,5 @@
 ApiAxle client for Go (golang)
--------------------------------
+==============================
 
 [![Build Status](https://travis-ci.org/rjohnsondev/go-axle.png)](https://travis-ci.org/rjohnsondev/go-axle) 
 [![Coverage Status](https://coveralls.io/repos/rjohnsondev/go-axle/badge.png?branch=HEAD)](https://coveralls.io/r/rjohnsondev/go-axle?branch=HEAD)
@@ -20,7 +20,7 @@ Generated documentation can be viewed by running:
 
     godoc -http :3000
 
-then navigating to http://localhost:3000/pkg/go-axle/ when the library is in your $GOPATH.
+then navigating to http://localhost:3000/pkg/go-axle/
 
 ## Usage
 
